@@ -5,6 +5,10 @@ export const marketingConfig: MarketingConfig = {
       title: "Postrex",
       href: "/",
     },
+    {
+      title: "RepRex",
+      href: "/",
+    },
    
   
   ],
