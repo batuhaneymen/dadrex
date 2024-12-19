@@ -1,31 +1,27 @@
-"use client";
-import * as React from "react";
-import Link from "next/link";
-import { useSelectedLayoutSegment } from "next/navigation";
-import { MainNavItem } from "@/types";
-import { cn } from "@/lib/utils";
-import { X } from "lucide-react";
-import { Separator } from "./ui/separator";
-import { MobileNav } from "./mobile-nav";
-import { Icons } from "./icons";
-import { ThemeToggle } from "./theme-toggle"; // ThemeToggle bileşenini ekle
-
+"use client"
+import * as React from "react"
+import Link from "next/link"
+import { useSelectedLayoutSegment } from "next/navigation"
+import { MainNavItem } from "@/types"
+import { cn } from "@/lib/utils"
+import { X } from 'lucide-react'
+import { Separator } from "./ui/separator"
+import { MobileNav } from "./mobile-nav"
+import { Icons } from "./icons"
 interface MainNavProps {
-  items?: MainNavItem[];
-  children?: React.ReactNode;
+  items?: MainNavItem[]
+  children?: React.ReactNode
 }
-
 export function MainNav({ items, children }: MainNavProps) {
-  const segment = useSelectedLayoutSegment();
-  const [showMobileMenu, setShowMobileMenu] = React.useState<boolean>(false);
-
+  const segment = useSelectedLayoutSegment()
+  const [showMobileMenu, setShowMobileMenu] = React.useState<boolean>(false)
   return (
-    <div className="flex gap-6 md:gap-10 items-center">
+    <div className="flex gap-6 md:gap-10">
       <Link href="/" className="hidden items-center space-x-2 md:flex">
-        <span className="font-bold text-lg">Runex</span>
       </Link>
       {items?.length ? (
-        <nav className="hidden gap-6 md:flex">
+        <nav className={cn("hidden gap-6 md:flex",
+        )}>
           {items?.map((item, index) => (
             <Link
               key={index}
@@ -35,7 +31,7 @@ export function MainNav({ items, children }: MainNavProps) {
                 item.href.startsWith(`/${segment}`)
                   ? "text-foreground"
                   : "text-foreground/60",
-                item.disabled && "cursor-not-allowed opacity-80"
+                item.disabled && "cursor-not-allowed opacity-80",
               )}
             >
               {item.title}
@@ -43,20 +39,21 @@ export function MainNav({ items, children }: MainNavProps) {
           ))}
         </nav>
       ) : null}
-      {/* Tema geçiş düğmesini buraya ekliyoruz */}
-      <div className="hidden md:flex items-center space-x-4">
-        <ThemeToggle />
-      </div>
       <button
         className="flex items-center space-x-2 md:hidden"
         onClick={() => setShowMobileMenu(!showMobileMenu)}
       >
-        {showMobileMenu ? <X /> : <Icons.menu />}
+        {showMobileMenu
+          ?
+          <X />
+          :
+          <Icons.menu />
+        }
         <Separator orientation="vertical" />
       </button>
       {showMobileMenu && items && (
         <MobileNav items={items}>{children}</MobileNav>
       )}
     </div>
-  );
+  )
 }

@@ -10,7 +10,7 @@ interface MarketingLayoutProps {
 export default function MarketingLayout({ children }: MarketingLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <header className="z-40 bg-[hsl(30,100%,50%)] text-[hsl(0,0%,0%)] border-b border-border">
+      <header className="z-40 border-b border-border">
         <div className="mx-auto flex h-20 items-center justify-between py-6 sm:px-8 px-2">
           <MainNav items={marketingConfig.mainNav} />
           <div className="flex flex-row items-center space-x-4">
@@ -19,7 +19,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
         </div>
       </header>
       <main className="flex-1 overflow-y-auto">{children}</main>
-      <footer className="bg-[hsla(0,0%,90%,0.8)] text-background">
+      <footer className="">
         <SiteFooter />
       </footer>
     </div>
