@@ -1,33 +1,31 @@
-"use client";
-
 import React from "react";
-import { cn } from "@/lib/utils";
+import classNames from "classnames";
+import Image from "next/image";
 import { ButtonProps } from "@/types";
 
 export function Button({
-  className,
-  variant = "default",
-  size = "medium",
   children,
+  onClick,
+  variant = "default",
+  className,
+  imageSrc,
+  imageAlt,
   ...props
 }: ButtonProps) {
   return (
     <button
-      className={cn(
-        "inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none",
-        // Variant colors
-        variant === "default" && "bg-gray-200 text-black hover:bg-gray-300",
-        variant === "primary" && "bg-blue-500 text-white hover:bg-blue-600",
-        variant === "secondary" && "bg-gray-500 text-white hover:bg-gray-600",
-        variant === "danger" && "bg-red-500 text-white hover:bg-red-600",
-        // Sizes
-        size === "small" && "px-3 py-1 text-sm",
-        size === "medium" && "px-4 py-2 text-base",
-        size === "large" && "px-6 py-3 text-lg",
+      onClick={onClick}
+      className={classNames(
+        "p-0 border-none bg-transparent",
+        {
+          "bg-white text-black hover:bg-orange-500": variant === "send",
+          "bg-white text-black hover:bg-red-500": variant === "close",
+        },
         className
       )}
       {...props}
     >
+      {imageSrc && <Image src={imageSrc} alt={imageAlt || "Button Image"} width={50} height={50} />}
       {children}
     </button>
   );

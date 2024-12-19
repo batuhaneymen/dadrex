@@ -17,6 +17,8 @@ export async function callReprexAPI(messages: { role: string; content: string }[
       }),
     });
 
+    console.log("API response status:", response.status); // API yanıt durumu
+
     if (!response.ok) {
       const errorData = await response.json(); // Hata detaylarını al
       console.error("OpenAI API error:", errorData); // Hata detaylarını logla
@@ -34,4 +36,3 @@ export async function callReprexAPI(messages: { role: string; content: string }[
     return "Reprex: Sorry, something went wrong.";
   }
 }
-//Frontend’den gelen mesajları OpenAI API’ye gönderir ve yanıtı geri döndürür.

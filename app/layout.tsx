@@ -4,7 +4,6 @@ import { Inter as FontSans } from "next/font/google";
 import { TailwindIndicator } from "@/components/tailwind-indicator";
 import { Analytics } from "@/components/analytics";
 import Script from "next/script";
-
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config/site";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -49,6 +48,7 @@ export const metadata = {
   },
   // manifest: `${siteConfig.url}/site.webmanifest`,
 };
+
 export default function RootLayout({
   children,
 }: {
@@ -56,32 +56,37 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head></head>
+      <head>
+        <link rel="icon" href="/favicon-16x16.png" sizes="16x16" />
+      </head>
       <body
         className={cn(
-          "min-h-screen bg-[#09090B]  font-sans antialiased",
-          fontSans.variable,
+          "min-h-screen bg-[#09090B] font-sans antialiased",
+          fontSans.variable
         )}
       >
-      
-              <ThemeProvider attribute="class" defaultTheme="dark">
-                {children}
-                 <TailwindIndicator /> 
-                <Toaster />
-                <Analytics />
-                <Script
-                  src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
-                />
-                <Script id="google-analytics">
-                  {`
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <TailwindIndicator />
+          <Toaster />
+          <Analytics />
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
+          />
+          <Script id="google-analytics">
+            {`
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
               gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
             `}
-                </Script>
-              </ThemeProvider>
-           
+          </Script>
+        </ThemeProvider>
       </body>
     </html>
   );

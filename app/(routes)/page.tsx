@@ -1,10 +1,9 @@
 "use client";
-
-import { useState } from "react";
+// Updated Chat Form Design
+import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,8 +15,23 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 type ChatMessage = {
-  role: "user" | "reprex";
+  role: "user" | "reprex" | "postrex";
   content: string;
+};
+
+// API warm-up function
+const warmUpAPI = async (): Promise<void> => {
+  try {
+    const response = await fetch("/api/gpt", {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      console.warn(`API warm-up failed: ${response.status}`);
+    }
+  } catch (error) {
+    console.warn("Error warming up API:", error);
+  }
 };
 
 export default function Page() {
@@ -29,14 +43,15 @@ export default function Page() {
     defaultValues: { message: "" },
   });
 
-  const sendMessageToReprex = async (values: FormValues) => {
+  // API ile mesaj gönderme fonksiyonu
+  const sendMessageToReprex = async (values: FormValues): Promise<void> => {
+    await warmUpAPI(); // API'yi ısıtmak için ön istek
+
     const userMessage = values.message;
 
-    // Add user message to chat
     setChatMessages((prev) => [...prev, { role: "user", content: userMessage }]);
 
     try {
-      // API call to backend
       const response = await fetch("/api/gpt", {
         method: "POST",
         headers: {
@@ -51,7 +66,6 @@ export default function Page() {
 
       const data = await response.json();
 
-      // Add bot messages to chat
       const botMessages = data.result.map((message: string) => ({
         role: "reprex",
         content: message,
@@ -69,54 +83,69 @@ export default function Page() {
     reprexForm.reset();
   };
 
+  const toggleRepRexDialog = (isOpen: boolean): void => {
+    setIsRepRexOpen(isOpen);
+    if (!isOpen) {
+      setChatMessages([]);
+    }
+  };
+
+  // API'yi sayfa yüklenirken ısıtmak için useEffect kullanımı
+  useEffect(() => {
+    warmUpAPI();
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 py-10 px-4">
       <div className="text-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Chat with Reprex</h1>
-        <Button onClick={() => setIsRepRexOpen(true)} className="mt-4">
-          Open Chat
-        </Button>
+        <h1 className="text-4xl font-bold text-gray-800">Chat with Reprex</h1>
+        <div className="flex justify-center space-x-4">
+          <Button onClick={() => toggleRepRexDialog(true)} className="mt-4 p-2" imageSrc="/image/rex-memes/reprexButton.jpg" imageAlt="Open Chat with Reprex" />
+        </div>
       </div>
 
       <Dialog open={isRepRexOpen}>
         <DialogContent>
-          <DialogHeader>
-            <h2 className="text-xl font-bold text-gray-900">Chat with Reprex</h2>
-          </DialogHeader>
-          <div className="flex-1 overflow-y-auto p-4 bg-gray-50 rounded-md space-y-4">
-            {chatMessages.map((message, index) => (
-              <div
-                key={index}
-                className={`p-3 rounded-lg w-fit max-w-[75%] ${
-                  message.role === "user"
-                    ? "bg-blue-600 text-white ml-auto text-right"
-                    : "bg-gray-200 text-gray-800 mr-auto text-left"
-                }`}
-              >
-                {message.content}
-              </div>
-            ))}
-          </div>
-          <form
-            onSubmit={reprexForm.handleSubmit(sendMessageToReprex)}
-            className="flex items-center space-x-2 mt-4"
-          >
-            <Input
-              {...reprexForm.register("message")}
-              placeholder="Type your message..."
-              className="flex-1 border border-gray-300 rounded-lg p-2"
-            />
-            <Button type="submit" className="bg-blue-500 text-white rounded-lg px-4">
-              Send
-            </Button>
-            <Button
-              type="button"
-              onClick={() => setIsRepRexOpen(false)}
-              className="bg-gray-500 text-white rounded-lg px-4"
+          <div className="w-[95%] max-w-6xl h-[85vh] flex flex-col p-8 bg-white rounded-lg shadow-lg relative">
+            <DialogHeader>
+              <h2 className="text-2xl font-bold text-gray-900">Chat with Reprex</h2>
+            </DialogHeader>
+            <div className="flex-1 overflow-y-auto p-6 bg-gray-50 rounded-md space-y-4">
+              {chatMessages.map((message, index) => (
+                <div
+                  key={index}
+                  className={`p-3 rounded-lg w-3/4 ${
+                    message.role === "user"
+                      ? "bg-blue-100 text-right ml-auto"
+                      : "bg-green-100 text-left mr-auto"
+                  }`}
+                >
+                  {message.content}
+                </div>
+              ))}
+            </div>
+            <form
+              onSubmit={reprexForm.handleSubmit(sendMessageToReprex)}
+              className="flex items-center space-x-3 mt-6"
             >
-              Close
-            </Button>
-          </form>
+              <Input
+                {...reprexForm.register("message")}
+                placeholder="Type your message..."
+                className="flex-1 border border-gray-300 rounded-lg p-3 text-lg"
+              />
+              <Button variant="send" className="px-6 py-3 rounded-lg">
+                Send
+              </Button>
+              <Button
+                variant="close"
+                type="button"
+                onClick={() => toggleRepRexDialog(false)}
+                className="px-6 py-3 rounded-lg"
+              >
+                Close
+              </Button>
+            </form>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
